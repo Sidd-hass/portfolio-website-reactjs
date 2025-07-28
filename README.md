@@ -4,7 +4,7 @@ A sleek, responsive, and fully customizable **animated portfolio website** built
 
 ## 🚀 Live Demo
 
-🔗 [View Portfolio Live](https://tarunkaushik.vercel.app/)
+🔗 [View Portfolio Live](https://portfolio-website-reactjs-jmpvgvhf7-siddhants-projects-f5eab5f7.vercel.app/)
 
 ## 🛠️ Tech Stack
 
@@ -26,7 +26,7 @@ A sleek, responsive, and fully customizable **animated portfolio website** built
 ### 1. Clone the Repo
 
 ```bash
-git clone [https://github.com/codingmastr/Tarun-s-Portfolio.git]
+git clone [https://github.com/Sidd-hass/portfolio-website-reactjs.git]
 cd your-repo-name
 ````
 
@@ -50,5 +50,5 @@ npm run build
 
 ## 🌟 Credits
 
-This project was created with ❤️ by [siddhant pandey](https://tarunkaushik.vercel.app/).
+This project was created with ❤️ by [siddhant pandey](https://portfolio-website-reactjs-jmpvgvhf7-siddhants-projects-f5eab5f7.vercel.app/).
 If you like it, feel free to ⭐ this repository and share!
