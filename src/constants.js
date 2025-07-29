@@ -226,7 +226,7 @@
         image: githubdetLogo,
         tags: ["HTML", "CSS", "JavaScript", "React JS", "API"],
         github: "https://github.com/Sidd-hass/github-profile-search-app",
-        webapp: "github-profile-search-app-sigma.vercel.app",
+        webapp: "https://github-profile-search-app-sigma.vercel.app/",
       },
       {
         id: 1,
