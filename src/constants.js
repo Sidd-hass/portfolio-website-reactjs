@@ -225,8 +225,8 @@
           "A powerful and user-friendly React.js application designed to uncover and showcase detailed GitHub profile information. Simply enter a GitHub username, and the app fetches comprehensive data, including profile stats, repositories, followers, and contributions. The intuitive interface ensures a seamless experience, making it a must-visit tool for developers and recruiters.",
         image: githubdetLogo,
         tags: ["HTML", "CSS", "JavaScript", "React JS", "API"],
-        github: "https://github.com/codingmastr/GitHub-Profile-Search-App-Using-React-JS",
-        webapp: "https://githubprofiledetective.netlify.app/",
+        github: "https://github.com/Sidd-hass/github-profile-search-app",
+        webapp: "github-profile-search-app-sigma.vercel.app",
       },
       {
         id: 1,
