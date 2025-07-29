@@ -143,7 +143,7 @@
       {
         id: 1,
         img: Digitem,
-        role: "Fullstack Developer",
+        role: "Frontend Developer",
         company: "Digitem Technologies",
         date: "February 2023 - April 2023",
         desc: "Developed dynamic and scalable web applications using the MERN stack, handling both frontend and backend development. Collaborated with cross-functional teams to build responsive UI, implement RESTful APIs, and optimize application performance in an agile environment.",
