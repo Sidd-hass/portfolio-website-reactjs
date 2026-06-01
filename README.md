@@ -51,4 +51,4 @@ npm run build
 ## 🌟 Credits
 
 This project was created with ❤️ by [siddhant pandey](https://portfolio-website-reactjs-jmpvgvhf7-siddhants-projects-f5eab5f7.vercel.app/).
-If you like it, feel free to ⭐ this repository and share!
+If you like it, feel free to ⭐ this repository and share! skjakds
