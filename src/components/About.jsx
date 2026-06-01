@@ -1,155 +1,123 @@
-import React, { useRef } from "react";
-import { Canvas, useFrame } from "@react-three/fiber";
-import { MeshDistortMaterial, Float } from "@react-three/drei";
+import React from "react";
 import { motion } from "framer-motion";
-import { Cpu, Terminal, Shield } from "lucide-react";
+import { useAudio } from "../hooks/useAudio";
 import { experiences } from "../constants";
 
-// Interactive 3D morphing blob shape
-function DistortedBlob() {
-  const solidRef = useRef();
-  const wireframeRef = useRef();
-
-  useFrame((state) => {
-    const time = state.clock.getElapsedTime();
-    // Subtle rotation
-    solidRef.current.rotation.x = time * 0.1;
-    solidRef.current.rotation.y = time * 0.12;
-
-    wireframeRef.current.rotation.x = time * -0.08;
-    wireframeRef.current.rotation.y = time * -0.1;
-  });
-
-  return (
-    <group>
-      {/* Solid Distorted Core */}
-      <mesh ref={solidRef}>
-        <sphereGeometry args={[1.3, 64, 64]} />
-        <MeshDistortMaterial
-          color="#7c3aed"
-          distort={0.45}
-          speed={2.2}
-          roughness={0.3}
-          metalness={0.8}
-        />
-      </mesh>
-
-      {/* Glowing Wireframe Outer shell */}
-      <mesh ref={wireframeRef} scale={1.02}>
-        <sphereGeometry args={[1.3, 32, 32]} />
-        <MeshDistortMaterial
-          color="#00f5ff"
-          distort={0.45}
-          speed={2.2}
-          wireframe={true}
-          emissive="#00f5ff"
-          emissiveIntensity={0.5}
-        />
-      </mesh>
-    </group>
-  );
-}
-
 export default function About() {
+  const { playSound } = useAudio();
+
+  const handleMouseEnter = () => {
+    playSound("scan");
+  };
+
   return (
     <section id="about" className="min-h-screen py-24 flex flex-col justify-center relative w-full container mx-auto px-6 z-10">
-      <div className="ambient-glow glow-3 absolute -bottom-1/4 -right-1/4" />
+      
+      {/* Title at the top to prevent overlapping */}
+      <div className="section-title-wrap mb-16 text-left">
+        <span className="section-subtitle">02 / ABOUT ME</span>
+        <h2 className="section-title text-neutral-200">THE ENGINEER</h2>
+      </div>
 
-      <div className="grid grid-cols-1 lg:grid-cols-12 gap-12 items-center w-full">
+      <div className="grid grid-cols-1 lg:grid-cols-12 gap-12 w-full border-t border-neutral-900/60 pt-12">
         
-        {/* Left Side: Bio & Professional Experience Timeline */}
+        {/* Left Column: Key Details */}
+        <motion.div
+          initial={{ opacity: 0, y: 30 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          viewport={{ once: true, margin: "-100px" }}
+          transition={{ duration: 0.8, ease: [0.16, 1, 0.3, 1] }}
+          className="lg:col-span-4 flex flex-col gap-6 text-left"
+        >
+          <div className="flex flex-col gap-4 font-sans text-xs tracking-wider text-neutral-500">
+            <div className="border-b border-neutral-900 pb-2">
+              <span className="text-neutral-400 block mb-0.5">CORE DISCIPLINE</span>
+              <span className="text-neutral-300 font-medium">DEVOPS & CLOUD ARCHITECTURE</span>
+            </div>
+            <div className="border-b border-neutral-900 pb-2">
+              <span className="text-neutral-400 block mb-0.5">LOCATION</span>
+              <span className="text-neutral-300 font-medium">NEW DELHI, INDIA (GMT +5:30)</span>
+            </div>
+            <div className="border-b border-neutral-900 pb-2">
+              <span className="text-neutral-400 block mb-0.5">PHILOSOPHY</span>
+              <span className="text-neutral-300 font-medium">INFRASTRUCTURE AS CODE & SITE RELIABILITY</span>
+            </div>
+          </div>
+        </motion.div>
+
+        {/* Right Column: Bio & Professional Experience Timeline */}
         <motion.div
           initial={{ opacity: 0, y: 40 }}
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true, margin: "-100px" }}
-          transition={{ duration: 1.0 }}
-          className="lg:col-span-7 flex flex-col gap-8 text-left"
+          transition={{ duration: 0.9, delay: 0.1, ease: [0.16, 1, 0.3, 1] }}
+          className="lg:col-span-8 flex flex-col gap-8 text-left"
         >
-          <div className="section-title-wrap mb-2">
-            <span className="section-subtitle">// BIOSTASIS FILE</span>
-            <h2 className="section-title text-glow-cyan text-white">THE ENGINEER</h2>
+          <div className="flex flex-col gap-4">
+            <p className="text-neutral-300 font-sans text-sm sm:text-base leading-relaxed">
+              I am <strong className="text-neutral-100 font-semibold">Siddhant Pandey</strong>. I operate at the junction of distributed backend infrastructures, cloud orchestration platforms, and frontend user interfaces. I configure and manage production architectures with a high focus on automation, health diagnostics, and container security.
+            </p>
+            <p className="text-neutral-400 font-sans text-sm sm:text-base leading-relaxed">
+              My engineering revolves around standardizing configuration tasks, optimizing server performance curves, and creating frictionless build/release cycles. I build reliable codebases that automate repetitive chores so clusters scale smoothly.
+            </p>
           </div>
 
-          <p className="text-slate-300 font-body leading-relaxed text-sm sm:text-base">
-            I am <strong className="text-[#00f5ff]">Siddhant Pandey</strong>, a DevOps & Cloud Infrastructure Architect designing resilient digital environments. Operating at the cross-section of distributed systems, automated configurations, and Site Reliability Engineering (SRE), I manage production networks across scalable clusters.
-          </p>
-
-          <p className="text-slate-300 font-body leading-relaxed text-sm sm:text-base mb-4">
-            My methodology centers on Infrastructure as Code (IaC) paradigms, automated CI/CD gating, and deep telemetry observability. I build standardized server playbooks, container configurations, and secure environments that automate workflows.
-          </p>
-
-          {/* Timeline */}
-          <div className="flex flex-col gap-6 relative border-l border-white/10 pl-6 ml-3">
-            {experiences.map((exp, idx) => (
-              <div key={idx} className="relative group">
-                {/* Timeline Connector node */}
-                <div className="absolute -left-[31px] top-1.5 w-4 h-4 bg-[#05070f] border border-[#00f5ff] rounded-full flex justify-center items-center">
-                  <span className="w-1.5 h-1.5 bg-[#00f5ff] rounded-full animate-pulse" />
-                </div>
-
-                <div className="glass-panel p-5 rounded-2xl flex flex-col gap-3 border border-white/[0.05] bg-[#05070f]/50 hover:bg-[#05070f]/75 transition-all duration-300">
-                  <div className="flex flex-wrap justify-between items-start gap-2">
+          {/* Timeline Grid */}
+          <div className="flex flex-col gap-8 mt-6">
+            <h3 className="font-display font-bold text-xs tracking-[2px] text-neutral-400 uppercase">
+              // EXPERIENCE HISTORY
+            </h3>
+            
+            <div className="flex flex-col gap-8">
+              {experiences.map((exp, idx) => (
+                <motion.div
+                  key={idx}
+                  className="timeline-item group flex flex-col gap-2"
+                  onMouseEnter={handleMouseEnter}
+                >
+                  <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2">
                     <div className="flex items-center gap-3">
                       {exp.img && (
-                        <div className={`w-10 h-10 flex justify-center items-center rounded-xl bg-[#05070f] border p-1.5 overflow-hidden transition-all duration-300 ${
-                          exp.company.includes("Meritech") 
-                            ? "border-[#7c3aed]/40 shadow-[0_0_12px_rgba(124,58,237,0.2)]" 
-                            : "border-[#00f5ff]/40 shadow-[0_0_12px_rgba(0,245,255,0.2)]"
-                        }`}>
-                          <img 
-                            src={exp.img} 
-                            alt={exp.company} 
-                            className={`w-full h-full object-contain transition-all duration-300 ${
-                              exp.company.includes("Meritech") 
-                                ? "filter drop-shadow-[0_0_3px_rgba(124,58,237,0.65)] brightness-125" 
-                                : "filter drop-shadow-[0_0_3px_rgba(0,245,255,0.65)] brightness-125"
-                            }`}
+                        <div className="w-12 h-12 shrink-0 flex justify-center items-center rounded-xl bg-neutral-900 border border-neutral-800 p-1.5 transition-all duration-300">
+                          <img
+                            src={exp.img}
+                            alt={exp.company}
+                            className="w-full h-full object-contain"
                           />
                         </div>
                       )}
                       <div>
-                        <h4 className="font-heading font-bold text-sm sm:text-base text-white">{exp.role}</h4>
-                        <span className="font-display text-[11px] text-[#7c3aed] uppercase tracking-wider font-semibold">{exp.company}</span>
+                        <h4 className="font-display font-bold text-sm sm:text-base text-neutral-200 group-hover:text-white transition-colors">
+                          {exp.role}
+                        </h4>
+                        <span className="font-sans text-xs text-neutral-400">
+                          {exp.company}
+                        </span>
                       </div>
                     </div>
-                    <span className="font-display text-[10px] text-slate-400 bg-white/5 border border-white/10 px-2.5 py-1 rounded-full">
+                    <span className="font-sans text-[11px] text-neutral-500 font-medium tracking-wide">
                       {exp.date}
                     </span>
                   </div>
 
-                  <p className="text-slate-400 font-body text-xs sm:text-sm leading-relaxed">{exp.desc}</p>
+                  <p className="text-neutral-400 font-sans text-xs sm:text-sm leading-relaxed max-w-2xl pl-0 sm:pl-9">
+                    {exp.desc}
+                  </p>
 
-                  <div className="flex flex-wrap gap-1.5 mt-2">
+                  <div className="flex flex-wrap gap-1.5 mt-1 pl-0 sm:pl-9">
                     {exp.skills.map((skill, sIdx) => (
-                      <span key={sIdx} className="project-tag text-[9px] px-2 py-0.5 border border-white/5 bg-white/[0.02] rounded-full text-slate-400">
+                      <span
+                        key={sIdx}
+                        className="text-[9px] font-sans tracking-wide text-neutral-500 bg-neutral-950 border border-neutral-900 px-2 py-0.5 rounded-md hover:border-indigo-500/30 hover:text-indigo-400 transition-colors"
+                      >
                         {skill}
                       </span>
                     ))}
                   </div>
-                </div>
-              </div>
-            ))}
+                </motion.div>
+              ))}
+            </div>
           </div>
-        </motion.div>
-
-        {/* Right Side: Distorted 3D Blob Canvas */}
-        <motion.div
-          initial={{ opacity: 0, scale: 0.8 }}
-          whileInView={{ opacity: 1, scale: 1 }}
-          viewport={{ once: true, margin: "-100px" }}
-          transition={{ duration: 1.2 }}
-          className="lg:col-span-5 h-[350px] lg:h-[500px] w-full flex justify-center items-center relative"
-        >
-          <div className="absolute w-[280px] h-[280px] bg-[#7c3aed]/10 rounded-full filter blur-[60px] pointer-events-none" />
-          
-          <Canvas camera={{ position: [0, 0, 3.5], fov: 60 }} dpr={[1, 2]}>
-            <ambientLight intensity={0.5} />
-            <directionalLight position={[5, 5, 5]} intensity={1.5} color="#00f5ff" />
-            <directionalLight position={[-5, -5, 5]} intensity={1} color="#7c3aed" />
-            <Float speed={1.8} rotationIntensity={0.5} floatIntensity={0.5}>
-              <DistortedBlob />
-            </Float>
-          </Canvas>
         </motion.div>
 
       </div>

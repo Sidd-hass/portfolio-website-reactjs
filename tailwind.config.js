@@ -1,18 +1,28 @@
 /** @type {import('tailwindcss').Config} */
-module.exports = {
+export default {
   content: ["./index.html", "./src/**/*.{js,jsx,ts,tsx}"],
   theme: {
     extend: {
+      fontFamily: {
+        sans: ["Inter", "system-ui", "sans-serif"],
+        display: ["Syne", "system-ui", "sans-serif"],
+      },
+      colors: {
+        accent: {
+          light: "#F5F5F0",
+          dark: "#0A0A0A",
+        }
+      },
       keyframes: {
         blob: {
           "0%": {
             transform: "scale(1)",
           },
           "33%": {
-            transform: "scale(1.2)",
+            transform: "scale(1.1)",
           },
           "66%": {
-            transform: "scale(0.8)",
+            transform: "scale(0.95)",
           },
           "100%": {
             transform: "scale(1)",
@@ -20,10 +30,7 @@ module.exports = {
         },
       },
       animation: {
-        blob: "blob 10s infinite",
-      },
-      backgroundImage: {
-        'skills-gradient': 'linear-gradient(38.73deg, rgba(204, 0, 187, 0.15) 0%, rgba(201, 32, 184, 0) 50%), linear-gradient(141.27deg, rgba(0, 70, 209, 0) 50%, rgba(0, 70, 209, 0.15) 100%) '
+        blob: "blob 8s infinite",
       },
     },
   },

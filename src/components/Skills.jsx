@@ -1,79 +1,107 @@
 import React from "react";
 import { motion } from "framer-motion";
+import { useAudio } from "../hooks/useAudio";
 import { SkillsInfo } from "../constants";
 
-// Assign custom border/glow accent colors per category card
-const ACCENT_COLORS = [
-  "border-[#00f5ff]/15 hover:border-[#00f5ff]/40 hover:shadow-[0_0_20px_rgba(0,245,255,0.15)]", // Frontend
-  "border-[#7c3aed]/15 hover:border-[#7c3aed]/40 hover:shadow-[0_0_20px_rgba(124,58,237,0.15)]", // Backend
-  "border-pink-500/15 hover:border-pink-500/40 hover:shadow-[0_0_20px_rgba(244,63,94,0.15)]",   // Languages
-  "border-[#00f5ff]/15 hover:border-[#7c3aed]/40 hover:shadow-[0_0_20px_rgba(124,58,237,0.15)]"  // DevOps & Tools
-];
-
-const HEADING_COLORS = [
-  "text-[#00f5ff] text-glow-cyan",
-  "text-[#7c3aed] text-glow-purple",
-  "text-pink-500 [text-shadow:0_0_10px_rgba(244,63,94,0.4)]",
-  "text-white bg-gradient-to-r from-[#00f5ff] to-[#7c3aed] bg-clip-text text-transparent"
-];
-
 export default function Skills() {
-  return (
-    <section id="skills" className="min-h-screen py-24 flex flex-col justify-center relative w-full container mx-auto px-6 z-10">
-      {/* Background neon glows */}
-      <div className="ambient-glow glow-1 absolute top-1/4 left-1/3" />
-      <div className="ambient-glow glow-2 absolute bottom-1/4 right-1/4" />
+  const { playSound } = useAudio();
 
-      <div className="section-title-wrap mb-16 text-left relative z-10">
-        <span className="section-subtitle">// INTELLECT MATRIX</span>
-        <h2 className="section-title text-glow-cyan text-white">THE STACK</h2>
+  // Extract all individual skills for the marquees
+  const allSkills = SkillsInfo.flatMap(group => group.skills);
+  // Split into two arrays for dual direction marquee
+  const midPoint = Math.ceil(allSkills.length / 2);
+  const row1Skills = allSkills.slice(0, midPoint);
+  const row2Skills = allSkills.slice(midPoint);
+
+  // Helper to render marquee list
+  const renderMarqueeRow = (skills, reverse = false) => {
+    // Duplicate skills list to ensure seamless looping
+    const doubledSkills = [...skills, ...skills, ...skills];
+    
+    return (
+      <div className="marquee-container py-3">
+        <div 
+          className="marquee-content flex items-center gap-6"
+          style={{ animationDirection: reverse ? "reverse" : "normal", animationDuration: "35s" }}
+        >
+          {doubledSkills.map((skill, idx) => (
+            <div
+              key={idx}
+              onMouseEnter={() => playSound("hover")}
+              className="flex items-center gap-2.5 px-5 py-2.5 bg-neutral-900/60 border border-neutral-800/40 hover:border-indigo-500/50 rounded-full cursor-none opacity-90 hover:opacity-100 transition-all duration-300 shadow-sm"
+            >
+              <img
+                src={skill.logo}
+                alt={skill.name}
+                className="w-4 h-4 object-contain"
+                onError={(e) => {
+                  e.target.style.display = "none";
+                }}
+              />
+              <span className="text-xs font-sans font-medium text-neutral-300 tracking-wide uppercase">
+                {skill.name}
+              </span>
+            </div>
+          ))}
+        </div>
+      </div>
+    );
+  };
+
+  return (
+    <section id="skills" className="min-h-screen py-32 flex flex-col justify-center relative w-full container mx-auto px-6 z-10 overflow-hidden">
+      
+      {/* Editorial Title */}
+      <div className="section-title-wrap mb-16 text-left">
+        <span className="section-subtitle">03 / CAPABILITIES</span>
+        <h2 className="section-title text-neutral-200">THE TECH STACK</h2>
       </div>
 
-      {/* Skills Grid */}
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 relative z-10 w-full">
+      {/* Double Row Marquee */}
+      <div className="flex flex-col gap-2 w-full my-8 relative">
+        {/* Subtle blur fades at edges */}
+        <div className="absolute top-0 bottom-0 left-0 w-16 md:w-32 bg-gradient-to-r from-[#0A0A0A] to-transparent z-20 pointer-events-none" />
+        <div className="absolute top-0 bottom-0 right-0 w-16 md:w-32 bg-gradient-to-l from-[#0A0A0A] to-transparent z-20 pointer-events-none" />
+        
+        {renderMarqueeRow(row1Skills, false)}
+        {renderMarqueeRow(row2Skills, true)}
+      </div>
+
+      {/* Categorized Minimal Textual Layout with stylish glass cards */}
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8 mt-16 w-full border-t border-neutral-900 pt-12">
         {SkillsInfo.map((group, groupIdx) => (
           <motion.div
             key={groupIdx}
-            initial={{ opacity: 0, y: 30 }}
+            initial={{ opacity: 0, y: 20 }}
             whileInView={{ opacity: 1, y: 0 }}
-            viewport={{ once: true, margin: "-100px" }}
-            transition={{ duration: 0.8, delay: groupIdx * 0.15 }}
-            className={`glass-panel bg-[#0c0e17]/85 backdrop-blur-md border ${ACCENT_COLORS[groupIdx]} rounded-3xl p-8 flex flex-col gap-6 transition-all duration-500`}
+            viewport={{ once: true, margin: "-50px" }}
+            transition={{ duration: 0.6, delay: groupIdx * 0.1 }}
+            className="glass-card-stylish flex flex-col gap-4 text-left"
           >
-            {/* Category Header */}
-            <div className="flex justify-between items-center border-b border-white/5 pb-4">
-              <h3 className={`font-heading font-extrabold text-xl tracking-wider uppercase ${HEADING_COLORS[groupIdx]}`}>
+            <div className="flex items-center gap-2 border-b border-neutral-950 pb-2">
+              <span className="font-sans text-[10px] text-neutral-500 font-bold tracking-wider">
+                0{groupIdx + 1} //
+              </span>
+              <h3 className="font-display font-bold text-sm tracking-widest text-neutral-200 uppercase">
                 {group.title}
               </h3>
-              <span className="font-display text-[9px] text-slate-500 tracking-[1.5px] bg-white/5 px-3 py-1 rounded-full border border-white/5">
-                SEC.0{groupIdx + 1} // ACTIVE
-              </span>
             </div>
-
-            {/* Badges Flex Grid */}
-            <div className="flex flex-wrap gap-3">
+            
+            <ul className="flex flex-col gap-2">
               {group.skills.map((skill, sIdx) => (
-                <motion.div
+                <li
                   key={sIdx}
-                  whileHover={{ scale: 1.05, y: -2 }}
-                  whileTap={{ scale: 0.95 }}
-                  className="flex items-center gap-2.5 px-3.5 py-2 bg-white/[0.02] hover:bg-white/[0.06] border border-white/5 hover:border-[#00f5ff]/30 rounded-full transition-all duration-300 cursor-none"
+                  onMouseEnter={() => playSound("hover")}
+                  className="font-sans text-xs text-neutral-400 hover:text-indigo-400 hover:pl-2 transition-all duration-300 py-1.5 border-b border-neutral-950/40 flex items-center justify-between group/item"
                 >
-                  <img
-                    src={skill.logo}
-                    alt={skill.name}
-                    className="w-5 h-5 object-contain"
-                    onError={(e) => {
-                      // Fallback icon styling if source fails
-                      e.target.style.display = "none";
-                    }}
-                  />
-                  <span className="text-xs font-heading font-medium text-slate-300">
+                  <span className="flex items-center gap-2">
+                    <span className="w-1.5 h-1.5 rounded-full bg-indigo-500 scale-0 group-hover/item:scale-100 transition-transform duration-300" />
                     {skill.name}
                   </span>
-                </motion.div>
+                  <span className="text-[9px] text-neutral-600 font-medium group-hover/item:text-indigo-500/50 transition-colors">ACTIVE</span>
+                </li>
               ))}
-            </div>
+            </ul>
           </motion.div>
         ))}
       </div>

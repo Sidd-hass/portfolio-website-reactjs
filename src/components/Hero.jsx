@@ -1,9 +1,7 @@
 import React, { useEffect, useState, useRef } from "react";
-import { ArrowUpRight, Download } from "lucide-react";
-import { Canvas, useFrame } from "@react-three/fiber";
-import { Float } from "@react-three/drei";
+import { ArrowDown, Download } from "lucide-react";
 import { motion } from "framer-motion";
-import * as THREE from "three";
+import { useAudio } from "../hooks/useAudio";
 import profileImage from "../assets/profile2.png";
 
 // Roles list
@@ -27,13 +25,13 @@ function Magnetic({ children }) {
       const x = e.clientX - (rect.left + rect.width / 2);
       const y = e.clientY - (rect.top + rect.height / 2);
       
-      // Pull element 30% towards mouse coordinates
-      element.style.transform = `translate(${x * 0.3}px, ${y * 0.3}px)`;
+      // Pull element 25% towards mouse coordinates
+      element.style.transform = `translate(${x * 0.25}px, ${y * 0.25}px)`;
     };
 
     const handleMouseLeave = () => {
       element.style.transform = "translate(0px, 0px)";
-      element.style.transition = "transform 0.4s cubic-bezier(0.23, 1, 0.32, 1)";
+      element.style.transition = "transform 0.4s cubic-bezier(0.16, 1, 0.3, 1)";
     };
 
     const handleMouseEnter = () => {
@@ -54,49 +52,7 @@ function Magnetic({ children }) {
   return <div ref={ref} className="inline-block transition-transform duration-300">{children}</div>;
 }
 
-// Text Scramble component for name/title reveal
-function ScrambleText({ text, delay = 0 }) {
-  const [displayText, setDisplayText] = useState("");
-
-  useEffect(() => {
-    const chars = "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789@#$%-=[]{}*+&%";
-    let timer;
-    let interval;
-    let iterations = 0;
-
-    const start = () => {
-      interval = setInterval(() => {
-        setDisplayText(() => {
-          return text
-            .split("")
-            .map((char, index) => {
-              if (char === " ") return " ";
-              if (index < iterations) return text[index];
-              return chars[Math.floor(Math.random() * chars.length)];
-            })
-            .join("");
-        });
-
-        iterations += 1 / 2;
-        if (iterations >= text.length) {
-          clearInterval(interval);
-          setDisplayText(text);
-        }
-      }, 30);
-    };
-
-    timer = setTimeout(start, delay * 1000);
-
-    return () => {
-      clearTimeout(timer);
-      clearInterval(interval);
-    };
-  }, [text, delay]);
-
-  return <span className="font-display tracking-tight text-white font-black">{displayText}</span>;
-}
-
-// Typewriter Subtitle
+// Simple Typewriter Subtitle
 function Typewriter({ words }) {
   const [displayText, setDisplayText] = useState("");
   const [wordIdx, setWordIdx] = useState(0);
@@ -111,149 +67,109 @@ function Typewriter({ words }) {
         timer = setTimeout(() => {
           setIsDeleting(false);
           setWordIdx((prev) => (prev + 1) % words.length);
-        }, 500);
+        }, 600);
       } else {
         timer = setTimeout(() => {
           setDisplayText(displayText.slice(0, -1));
-        }, 45);
+        }, 30);
       }
     } else {
       if (displayText === currentWord) {
         timer = setTimeout(() => {
           setIsDeleting(true);
-        }, 2000);
+        }, 2200);
       } else {
         timer = setTimeout(() => {
           setDisplayText(currentWord.slice(0, displayText.length + 1));
-        }, 85);
+        }, 60);
       }
     }
 
     return () => clearTimeout(timer);
   }, [displayText, isDeleting, wordIdx, words]);
 
-  const [blink, setBlink] = useState(true);
-  useEffect(() => {
-    const cursorTimer = setInterval(() => setBlink(b => !b), 500);
-    return () => clearInterval(cursorTimer);
-  }, []);
-
   return (
-    <span className="font-heading font-medium text-slate-300">
+    <span className="font-sans font-medium text-neutral-400">
       {displayText}
-      <span className={`text-[#00f5ff] ml-1 font-bold ${blink ? "opacity-100" : "opacity-0"}`}>|</span>
+      <span className="animate-pulse ml-0.5 font-bold text-neutral-200">|</span>
     </span>
   );
 }
 
-// Torus Knot floating geometric shape
-function TorusKnotShape() {
-  const meshRef = useRef();
-
-  useFrame((state) => {
-    const time = state.clock.getElapsedTime();
-    const { x, y } = state.mouse;
-
-    // Slowly rotate knot + subtle mouse parallax coordinates mapping
-    meshRef.current.rotation.x = time * 0.12 + y * 0.4;
-    meshRef.current.rotation.y = time * 0.18 + x * 0.4;
-  });
-
-  return (
-    <mesh ref={meshRef}>
-      <torusKnotGeometry args={[1.2, 0.4, 150, 16]} />
-      <meshStandardMaterial
-        color="#00f5ff"
-        wireframe={true}
-        emissive="#00f5ff"
-        emissiveIntensity={0.7}
-        roughness={0.1}
-        metalness={0.95}
-      />
-    </mesh>
-  );
-}
-
 export default function Hero() {
+  const { playSound } = useAudio();
+
   const handleScrollTo = (id) => {
+    playSound("click");
     const el = document.getElementById(id);
     if (el) {
       el.scrollIntoView({ behavior: "smooth" });
     }
   };
 
+  const onBtnClick = () => {
+    playSound("click");
+  };
+
+  const nameText = "SIDDHANT PANDEY";
+
   return (
-    <section id="hero" className="min-h-screen flex flex-col justify-start md:justify-center relative w-full container mx-auto px-6 pt-36 md:pt-24 z-10 overflow-hidden">
-      {/* Glow overlays */}
-      <div className="ambient-glow glow-1 absolute -top-1/4 -right-1/4" />
-      <div className="ambient-glow glow-2 absolute bottom-1/4 -left-1/4" />
-
-      <div className="grid grid-cols-1 md:grid-cols-12 gap-8 items-center w-full min-h-[80vh] relative z-10">
+    <section id="hero" className="min-h-screen flex flex-col justify-start lg:justify-center relative w-full container mx-auto px-6 pb-12 z-10 overflow-hidden">
+      {/* Spacer to push content down below the fixed header on all devices */}
+      <div className="h-28 lg:h-32 shrink-0" />
+      
+      <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-center w-full relative z-10">
         
-        {/* Left Side: Copy and Links */}
-        <motion.div
-          initial={{ opacity: 0, y: 30 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 1.2, ease: "easeOut" }}
-          className="md:col-span-7 flex flex-col gap-5 text-left"
-        >
-          {/* Mobile Spacer to clear navbar */}
-          <div className="h-24 md:hidden" />
-
-          {/* Status Header Badge */}
+        {/* Left Column: Massive Editorial Typography & Info */}
+        <div className="lg:col-span-8 flex flex-col gap-6 text-left">
+          
+          {/* Status Label */}
           <div className="flex">
-            <div className="inline-flex items-center gap-2 px-3 py-1.5 bg-[#7c3aed]/10 border border-[#7c3aed]/25 rounded-full font-display text-[10px] tracking-[1.5px] font-semibold text-[#7c3aed] uppercase">
-              <span className="w-1.5 h-1.5 bg-[#7c3aed] rounded-full shadow-[0_0_8px_#7c3aed] animate-pulse" />
-              SYSTEM CORE INSTALLED // v2.0.26
+            <div className="inline-flex items-center gap-2 text-[10px] tracking-[3px] text-neutral-500 uppercase font-sans font-bold">
+              <span>[ AVAILABILITY / REMOTE & ONSITE ]</span>
             </div>
           </div>
 
-          {/* User Name Header */}
-          <div className="flex flex-col gap-1">
-            <span className="font-display text-[10px] tracking-[2.5px] text-[#00f5ff] uppercase font-bold">
-              // SECURE LINK PROTOCOL
-            </span>
-            <h2 className="text-xl sm:text-2xl font-display font-extrabold text-white tracking-widest uppercase">
-              <ScrambleText text="SIDDHANT PANDEY" delay={0.1} />
-            </h2>
-          </div>
-
-          {/* Name Header with Scramble reveal */}
-          <h1 className="text-4xl sm:text-6xl md:text-7xl font-display font-black leading-[1.05] tracking-tight uppercase">
-            ORCHESTRATING THE <br />
-            <span className="text-gradient">
-              <ScrambleText text="CLOUD FRONTIER" delay={0.6} />
-            </span>
+          {/* Name letter stagger entrance with vibrant gradient */}
+          <h1 className="font-display font-bold leading-[0.9] tracking-[-3px] flex flex-wrap max-w-4xl" style={{ fontSize: "clamp(3.2rem, 9.5vw, 7.5rem)" }}>
+            {nameText.split("").map((letter, idx) => (
+              <motion.span
+                key={idx}
+                initial={{ opacity: 0, y: 50 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{
+                  duration: 0.8,
+                  delay: idx * 0.04,
+                  ease: [0.16, 1, 0.3, 1]
+                }}
+                className={`${letter === " " ? "mr-4 sm:mr-6" : ""} bg-gradient-to-r from-cyan-400 via-indigo-400 to-pink-500 bg-clip-text text-transparent`}
+              >
+                {letter}
+              </motion.span>
+            ))}
           </h1>
 
-          {/* Role Subtitle with Typewriter effect */}
-          <p className="text-xl sm:text-2xl text-slate-300 font-heading min-h-[3rem] flex items-center">
-            I am a&nbsp;
-            <Typewriter words={ROLES} />
-          </p>
+          {/* Subtitle & Role Selection */}
+          <div className="flex flex-col gap-2">
+            <div className="text-lg md:text-xl min-h-[2rem] flex items-center">
+              <Typewriter words={ROLES} />
+            </div>
+            
+            <p className="text-neutral-400 font-sans text-sm md:text-base max-w-xl leading-relaxed mt-2">
+              Engineering high-availability cloud fabrics, automating complex deployment routines, and developing robust frontend systems. Designed for premium performance telemetry models.
+            </p>
+          </div>
 
-          <p className="text-slate-400 font-body text-sm sm:text-base max-w-lg leading-relaxed">
-            I engineer cloud network infrastructures, design scalable container fabrics, and develop fullstack applications using cutting-edge telemetry observability and automation models.
-          </p>
-
-          {/* Action CTAs */}
-          <div className="flex flex-wrap gap-4 mt-4">
+          {/* Minimalist CTAs */}
+          <div className="flex flex-wrap gap-4 mt-6">
             <Magnetic>
               <button
                 onClick={() => handleScrollTo("projects")}
-                className="btn-premium interactive-hover flex items-center gap-2 bg-[#00f5ff]/10 border border-[#00f5ff] text-white hover:bg-transparent rounded-xl px-6 py-3 font-heading uppercase text-xs font-semibold tracking-wider transition-all duration-300"
+                onMouseEnter={() => playSound("hover")}
+                className="btn-pill hover:border-indigo-400 hover:bg-indigo-500 hover:text-white"
               >
                 Scan Projects
-                <ArrowUpRight size={16} />
-              </button>
-            </Magnetic>
-            
-            <Magnetic>
-              <button
-                onClick={() => handleScrollTo("contact")}
-                className="btn-premium btn-premium-secondary interactive-hover flex items-center gap-2 border border-white/20 text-white hover:border-[#7c3aed] rounded-xl px-6 py-3 font-heading uppercase text-xs font-semibold tracking-wider transition-all duration-300"
-              >
-                Connect Protocol
+                <ArrowDown size={14} className="ml-1" />
               </button>
             </Magnetic>
 
@@ -262,57 +178,59 @@ export default function Hero() {
                 href="https://drive.google.com/file/d/1PlEqaMFdAAvsdEVW93m4FX1WXq4cJcWm/view?usp=sharing"
                 target="_blank"
                 rel="noreferrer"
-                className="btn-premium interactive-hover flex items-center gap-2 bg-[#7c3aed]/10 border border-[#7c3aed]/50 text-white hover:border-[#7c3aed] rounded-xl px-6 py-3 font-heading uppercase text-xs font-semibold tracking-wider transition-all duration-300"
+                onClick={onBtnClick}
+                onMouseEnter={() => playSound("hover")}
+                className="btn-pill btn-pill-secondary flex items-center hover:text-pink-400 hover:border-pink-500/50"
               >
                 Download CV
-                <Download size={16} />
+                <Download size={14} className="ml-1.5" />
               </a>
             </Magnetic>
+
+            <Magnetic>
+              <button
+                onClick={() => handleScrollTo("contact")}
+                onMouseEnter={() => playSound("hover")}
+                className="btn-pill btn-pill-secondary hover:text-cyan-400 hover:border-cyan-500/50"
+              >
+                Connect Protocol
+              </button>
+            </Magnetic>
           </div>
-        </motion.div>
+        </div>
 
-        {/* Right Side: Profile Image + R3F Torus Knot */}
-        <motion.div
-          initial={{ opacity: 0, scale: 0.8 }}
-          animate={{ opacity: 1, scale: 1 }}
-          transition={{ duration: 1.5, delay: 0.2, ease: "easeOut" }}
-          className="md:col-span-5 h-[350px] md:h-[500px] w-full flex justify-center items-center relative"
-        >
-          {/* Subtle backdrop circle glow behind shape */}
-          <div className="absolute w-[250px] h-[250px] bg-gradient-to-r from-[#00f5ff]/15 to-[#7c3aed]/15 rounded-full filter blur-[50px] pointer-events-none" />
-          
-          {/* 3D Torus Knot behind the profile */}
-          <Canvas camera={{ position: [0, 0, 4], fov: 55 }} dpr={[1, 2]}>
-            <ambientLight intensity={0.4} />
-            <directionalLight position={[10, 10, 5]} intensity={1.5} color="#00f5ff" />
-            <directionalLight position={[-10, -10, 5]} intensity={1} color="#7c3aed" />
-            <Float speed={2.5} rotationIntensity={0.8} floatIntensity={0.6}>
-              <TorusKnotShape />
-            </Float>
-          </Canvas>
-
-          {/* Profile Image Overlay */}
+        {/* Right Column: Premium floating offset profile picture with spinning gradient outline */}
+        <div className="lg:col-span-4 flex justify-center lg:justify-end items-center relative">
           <motion.div
-            className="absolute inset-0 flex items-center justify-center pointer-events-none"
-            initial={{ opacity: 0, scale: 0.6 }}
-            animate={{ opacity: 1, scale: 1 }}
-            transition={{ duration: 1.2, delay: 0.5, ease: "easeOut" }}
+            initial={{ opacity: 0, scale: 0.9, y: 15 }}
+            animate={{ 
+              opacity: 1, 
+              scale: 1, 
+              y: [-10, 10, -10]
+            }}
+            transition={{ 
+              opacity: { duration: 1.2, ease: "easeOut" },
+              scale: { duration: 1.2, ease: "easeOut" },
+              y: { repeat: Infinity, duration: 6, ease: "easeInOut" }
+            }}
+            onMouseEnter={() => playSound("scan")}
+            className="relative w-[220px] h-[220px] sm:w-[280px] sm:h-[280px] rounded-full p-1 border-2 border-indigo-500/50 shadow-[0_0_25px_rgba(99,102,241,0.3)]"
           >
-            <div className="relative w-[200px] h-[200px] md:w-[260px] md:h-[260px]">
-              {/* Animated glowing ring */}
-              <div className="absolute -inset-3 rounded-full bg-gradient-to-tr from-[#00f5ff] via-[#7c3aed] to-[#f43f5e] opacity-60 blur-md animate-spin" style={{ animationDuration: '8s' }} />
-              <div className="absolute -inset-1.5 rounded-full bg-gradient-to-br from-[#00f5ff] to-[#7c3aed] opacity-80" />
-              {/* Image container */}
-              <div className="relative w-full h-full rounded-full overflow-hidden border-2 border-[#0c0e17]">
-                <img
-                  src={profileImage}
-                  alt="Siddhant Pandey"
-                  className="w-full h-full object-cover"
-                />
-              </div>
+            {/* Spinning decorative gradient rings */}
+            <div className="absolute -inset-1.5 rounded-full bg-gradient-to-tr from-cyan-400 via-indigo-500 to-pink-500 opacity-60 blur-sm animate-[spin_10s_linear_infinite]" />
+            
+            <div className="relative w-full h-full rounded-full overflow-hidden bg-neutral-900 border border-neutral-800">
+              <img
+                src={profileImage}
+                alt="Siddhant Pandey"
+                className="w-full h-full object-cover scale-105 hover:scale-100 transition-transform duration-700"
+              />
             </div>
+            
+            {/* Glowing floating dot */}
+            <div className="absolute top-8 right-8 w-3 h-3 rounded-full bg-pink-500 border border-neutral-950 shadow-[0_0_8px_#ff007f] animate-pulse" />
           </motion.div>
-        </motion.div>
+        </div>
 
       </div>
     </section>

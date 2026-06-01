@@ -13,10 +13,14 @@ import Skills from "./components/Skills";
 import Projects from "./components/Projects";
 import Education from "./components/Education";
 import Contact from "./components/Contact";
+import SoundToggle from "./components/SoundToggle";
+import { AudioProvider, useAudio } from "./hooks/useAudio";
 
 gsap.registerPlugin(ScrollTrigger);
 
-export default function App() {
+function AppContent() {
+  const { playSound } = useAudio();
+
   useEffect(() => {
     // Initialize Lenis smooth scroll
     const lenis = new Lenis({
@@ -51,21 +55,42 @@ export default function App() {
     };
   }, []);
 
-  return (
-    <div className="bg-[#05070f] min-h-screen text-slate-100 selection:bg-[#00f5ff]/20 selection:text-white relative">
-      {/* Procedural Grain Noise Overlay */}
-      <div className="noise-overlay" />
+  // Section whoosh trigger
+  useEffect(() => {
+    const observer = new IntersectionObserver(
+      (entries) => {
+        entries.forEach((entry) => {
+          if (entry.isIntersecting) {
+            // Trigger whoosh sound when section enters viewport
+            playSound("whoosh");
+          }
+        });
+      },
+      { threshold: 0.15 } // Trigger when 15% visible
+    );
 
-      {/* 3D WebGL Starfield Background */}
+    const sections = ["hero", "about", "skills", "projects", "education", "contact"];
+    sections.forEach((id) => {
+      const el = document.getElementById(id);
+      if (el) observer.observe(el);
+    });
+
+    return () => observer.disconnect();
+  }, [playSound]);
+
+  return (
+    <div className="bg-[#0A0A0A] min-h-screen text-neutral-200 selection:bg-neutral-800 selection:text-white relative">
+      
+      {/* 3D Grid & Drifting blooms Background */}
       <Background3D />
 
-      {/* Cybernetic Pointer Dot & Ring Custom Cursor */}
+      {/* Minimal custom cursor */}
       <CustomCursor />
 
-      {/* Frosted Floating Header Navbar */}
+      {/* Minimal navigation bar */}
       <Header />
 
-      {/* Sections scroll sequence */}
+      {/* Main sections sequence */}
       <main className="relative z-10 w-full flex flex-col items-center">
         <Hero />
         <About />
@@ -75,23 +100,30 @@ export default function App() {
         <Contact />
       </main>
 
-      {/* Minimalist Footer System Telemetry */}
-      <footer className="relative z-10 bg-[#05070f] border-t border-white/5 py-12 px-6">
-        <div className="container mx-auto max-w-6xl">
-          {/* Subtle animated gradient line */}
-          <div className="w-full h-[1.5px] bg-gradient-to-r from-transparent via-[#00f5ff] to-transparent shadow-[0_0_8px_rgba(0,245,255,0.4)] animate-pulse mb-8" />
-          
-          <div className="flex flex-col md:flex-row justify-between items-center gap-4 text-center md:text-left">
-            <span className="font-heading text-xs text-slate-500 tracking-[1px] uppercase">
-              © {new Date().getFullYear()} SIDDHANT PANDEY. DESIGNED FOR PREMIUM FULLSTACK INFRASTRUCTURES.
+      {/* Persistent global sound toggle */}
+      <SoundToggle />
+
+      {/* Clean minimal editorial footer */}
+      <footer className="relative z-10 bg-[#0A0A0A] border-t border-neutral-900 pt-12 pb-24 md:pb-12 px-6">
+        <div className="container mx-auto">
+          <div className="flex flex-col md:flex-row justify-between items-center gap-4 text-center md:text-left text-neutral-500 font-sans">
+            <span className="text-xs tracking-wider uppercase">
+              © {new Date().getFullYear()} SIDDHANT PANDEY. ALL RIGHTS RESERVED.
             </span>
-            <div className="flex gap-4 items-center text-[10px] font-display text-slate-500 tracking-wider">
-              <span className="text-[#00f5ff]">[ STACK: REACT // R3F // TAILWIND ]</span>
-              <span>SYSTEM_ONLINE_v2.0.26</span>
+            <div className="flex gap-4 items-center text-[10px] tracking-[2px] text-neutral-600 font-medium">
+              <span>[ SYSTEM STATUS: ONLINE ]</span>
             </div>
           </div>
         </div>
       </footer>
     </div>
+  );
+}
+
+export default function App() {
+  return (
+    <AudioProvider>
+      <AppContent />
+    </AudioProvider>
   );
 }
